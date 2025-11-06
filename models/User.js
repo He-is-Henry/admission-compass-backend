@@ -27,6 +27,8 @@ const userSchema = new schema({
       },
     },
   ],
+  referredBy: { type: schema.Types.ObjectId, required: true },
+  role: { type: String, enum: ["user", "admin", "parent"], default: "user" },
 });
 
 module.exports = mongoose.model("User", userSchema);

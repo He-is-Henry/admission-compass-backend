@@ -2,35 +2,44 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { getClientInfo } = require("../utils/getClientInfo");
+const { createInvitation } = require("./invitationController");
 const ACCESS_TOKEN_EXPIRY = "15m";
 const REFRESH_TOKEN_EXPIRY = "30d";
 const ACCESS_TOKEN_KEY = process.env.ACCESS_TOKEN_KEY;
 const REFRESH_TOKEN_KEY = process.env.REFRESH_TOKEN_KEY;
+
 const signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, username, password } = req.body;
+    const { firstName, lastName, email, username, password, parent } = req.body;
+    const { ref } = req.query;
     const emailAlreadyExists = await User.findOne({ email });
     if (emailAlreadyExists)
       return res.status(409).json({ error: "Email already exists" });
     const hashed = await bcrypt.hash(password, 10);
     if (!firstName || lastName || email || password)
       return res.status(400).json({ error: "Incomplete info" });
+    const referrer = await User.findById(ref);
+    if (!referrer) return res.status(400).json({ error: "Invalid ref" });
+    const role = parent ? "parent" : "user";
     const user = await User.create({
       firstName,
       lastName,
       email,
       username,
       password: hashed,
+      role,
     });
-    res.json(user);
+    const { password: pwd, sessions, ...filtered } = user;
+
+    if (ref) await createInvitation(ref, user._id);
+    res.json(filtered);
   } catch (err) {
     console.log(err);
   }
 };
 
 const login = async (req, res) => {
-  const { email, password, username } = req.body;
-  const id = email ? email : username;
+  const { id, password } = req.body;
   if (!id || !password)
     return res.status(400).json({ error: "Email and password are required" });
   let message = "Success, ";
