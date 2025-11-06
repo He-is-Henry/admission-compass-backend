@@ -1,8 +1,3 @@
-const allowList = [
-  "http://127.0.0.1:5500",
-  "http://localhost:5500",
-  "http://127.0.0.1:5173",
-  "http://localhost:5173",
-];
+const allowList = ["http:/10.249.49.156:3000", "http://localhost:3000"];
 
 module.exports = allowList;

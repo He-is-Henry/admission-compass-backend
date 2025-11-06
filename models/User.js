@@ -27,7 +27,7 @@ const userSchema = new schema({
       },
     },
   ],
-  referredBy: { type: schema.Types.ObjectId, required: true },
+  referredBy: { type: schema.Types.ObjectId },
   role: { type: String, enum: ["user", "admin", "parent"], default: "user" },
 });
 

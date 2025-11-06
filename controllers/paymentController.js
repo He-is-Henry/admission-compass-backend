@@ -1,19 +1,19 @@
 const crypto = require("crypto");
 const Payment = require("../models/Payment.js");
+const axios = require("axios");
 
 const initiatePayment = async (req, res) => {
   try {
-    const { id, email, name, quantity } = req.user;
+    const { id, email, name } = req.user;
     const response = await axios.post(
       "https://api.paystack.co/transaction/initialize",
       {
         email,
-        amount: 1000 * 100 * quantity,
+        amount: 1000 * 100,
         currency: "NGN",
         metadata: {
           id,
           name,
-          quantity,
         },
         callback_url: `${process.env.FRONTEND_URL}/pay/success`,
       },
@@ -67,7 +67,6 @@ const paystackWebhook = async (req, res) => {
       reference: data.reference,
       amount: data.amount / 100, // kobo → naira
       user: data.metadata.id,
-      quantity: data.metadata.quantity,
     });
 
     return res.sendStatus(200);

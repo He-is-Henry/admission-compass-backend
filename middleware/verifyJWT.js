@@ -1,14 +1,15 @@
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 
 const verifyUserJWT = async (req, res, next) => {
   try {
-    const token = req.cookies?.user;
+    const token = req.cookies?.jwt;
 
     if (!token) {
       return res.status(401).json({ error: "Token not found" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_KEY);
     const userId = decoded.id;
 
     const user = await User.findById(userId);

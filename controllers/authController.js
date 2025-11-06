@@ -15,11 +15,16 @@ const signup = async (req, res) => {
     const emailAlreadyExists = await User.findOne({ email });
     if (emailAlreadyExists)
       return res.status(409).json({ error: "Email already exists" });
+    const usernameAlreadyExists = await User.findOne({ username });
+    if (usernameAlreadyExists)
+      return res
+        .status(409)
+        .json({ error: "Username already exists, please try a different one" });
     const hashed = await bcrypt.hash(password, 10);
-    if (!firstName || lastName || email || password)
+    if (!firstName || !lastName || !email || !password)
       return res.status(400).json({ error: "Incomplete info" });
-    const referrer = await User.findById(ref);
-    if (!referrer) return res.status(400).json({ error: "Invalid ref" });
+    let referrer;
+    if (ref) referrer = await User.findById(ref);
     const role = parent ? "parent" : "user";
     const user = await User.create({
       firstName,
@@ -34,7 +39,8 @@ const signup = async (req, res) => {
     if (ref) await createInvitation(ref, user._id);
     res.json(filtered);
   } catch (err) {
-    console.log(err);
+    console.log(error);
+    res.status(500).json({ error });
   }
 };
 
@@ -67,7 +73,7 @@ const login = async (req, res) => {
       $or: [{ email: id }, { username: id }],
     });
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.sendStatus(401);
+    if (!match) return res.status(401).json({ error: "Incorrect password" });
     // Step 3: Enforce session limit
     if (user.sessions.length >= 5) {
       user.sessions.sort(
@@ -102,6 +108,7 @@ const login = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Strict",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
+    console.log(refreshToken);
 
     res.status(200).json({
       message,
@@ -169,4 +176,16 @@ const handleRefresh = async (req, res) => {
   }
 };
 
-module.exports = { signup, login, handleRefresh };
+const getCurrentUser = async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) res.status(400).json({ error: "User doesn't exist" });
+    delete user.password;
+    delete user.sessions;
+    res.json(user);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+module.exports = { signup, login, handleRefresh, getCurrentUser };
