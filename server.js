@@ -8,7 +8,7 @@ const paystackRoutes = require("./routes/paymentRoutes");
 const corsOptions = require("./config/corsOptions");
 const connectDB = require("./config/connectDB");
 const { default: mongoose } = require("mongoose");
-const PORT = process.env.POST || 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cookieParser());
 app.use(express.json());
