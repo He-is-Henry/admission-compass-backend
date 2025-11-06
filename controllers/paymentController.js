@@ -33,6 +33,8 @@ const initiatePayment = async (req, res) => {
 };
 
 const paystackWebhook = async (req, res) => {
+  console.log("PAYSTACK WEBHOOK HIT");
+
   try {
     const secret = process.env.PAYSTACK_SECRET_KEY;
 
