@@ -12,14 +12,17 @@ const signup = async (req, res) => {
   try {
     const { firstName, lastName, email, username, password, parent } = req.body;
     const { ref } = req.query;
+
     const emailAlreadyExists = await User.findOne({ email });
     if (emailAlreadyExists)
       return res.status(409).json({ error: "Email already exists" });
+
     const usernameAlreadyExists = await User.findOne({ username });
     if (usernameAlreadyExists)
       return res
         .status(409)
         .json({ error: "Username already exists, please try a different one" });
+
     const hashed = await bcrypt.hash(password, 10);
     if (!firstName || !lastName || !email || !password)
       return res.status(400).json({ error: "Incomplete info" });

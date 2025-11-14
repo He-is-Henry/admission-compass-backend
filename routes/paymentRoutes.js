@@ -5,7 +5,7 @@ const verifyUserJWT = require("../middleware/verifyJWT");
 
 router.post("/", verifyUserJWT, paymentController.initiatePayment);
 router.post(
-  "/confirm",
+  "/webhook",
   express.raw({ type: "*/*" }),
   verifyUserJWT,
   paymentController.paystackWebhook
