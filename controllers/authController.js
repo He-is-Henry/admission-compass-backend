@@ -185,7 +185,9 @@ const getCurrentUser = async (req, res) => {
     if (!user) res.status(400).json({ error: "User doesn't exist" });
     delete user.password;
     delete user.sessions;
-    res.json(user);
+
+    const payments = await Payment.find({ user: user._id, used: false });
+    res.json({ user, tokens: payments.length });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: err.message });

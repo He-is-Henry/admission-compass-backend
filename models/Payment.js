@@ -7,6 +7,7 @@ const paymentSchema = new schema(
     reference: { type: String, unique: true },
     status: String,
     quantity: { type: Number },
+    used: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
