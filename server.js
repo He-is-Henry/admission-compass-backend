@@ -11,10 +11,10 @@ const { default: mongoose } = require("mongoose");
 const PORT = process.env.PORT || 5000;
 
 app.use(cookieParser());
+app.use("/pay", paystackRoutes);
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use("/", userRoutes);
-app.use("/pay", paystackRoutes);
 connectDB();
 mongoose.connection.once("open", () => {
   app.listen(PORT, () => {
