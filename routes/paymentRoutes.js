@@ -7,7 +7,6 @@ router.post("/", verifyUserJWT, paymentController.initiatePayment);
 router.post(
   "/webhook",
   express.raw({ type: "*/*" }),
-  verifyUserJWT,
   paymentController.paystackWebhook
 );
 
